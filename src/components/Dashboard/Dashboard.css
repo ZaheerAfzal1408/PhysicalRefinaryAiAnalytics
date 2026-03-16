@@ -1,0 +1,282 @@
+/* ── Dashboard Layout ─────────────────────────────────────────── */
+.dashboard {
+  padding: 40px 32px;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.dashboard__inner {
+  max-width: 1300px;
+  margin: 0 auto;
+}
+
+/* ── Header ──────────────────────────────────────────────────── */
+.dashboard__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 36px;
+}
+
+.dashboard__title {
+  font-size: 38px;
+  font-weight: 900;
+  color: #0f172a;
+  letter-spacing: -0.04em;
+  font-style: italic;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.dashboard__title-accent {
+  color: #4f46e5;
+}
+
+.dashboard__subtitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #94a3b8;
+}
+
+.dashboard__clock {
+  background: #fff;
+  border-radius: 16px;
+  padding: 10px 18px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ── Stat cards grid ─────────────────────────────────────────── */
+.dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+/* ── Alert strip ─────────────────────────────────────────────── */
+.alert-strip {
+  background: #fff;
+  border-radius: 20px;
+  padding: 16px 22px;
+  border: 1.5px solid #f1f5f9;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.05);
+  margin-bottom: 32px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.alert-strip__label {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #94a3b8;
+  margin-right: 4px;
+}
+
+.alert-strip__badge {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 12px;
+  padding: 5px 12px;
+}
+
+.alert-strip__room-name {
+  font-size: 11px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.alert-strip__temp {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* ── Room cards grid ─────────────────────────────────────────── */
+.dashboard__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 24px;
+}
+
+/* ── Room card ───────────────────────────────────────────────── */
+.room-card {
+  background: #fff;
+  border-radius: 36px;
+  padding: 32px;
+  cursor: pointer;
+  transition: box-shadow 0.35s, transform 0.35s;
+}
+
+.room-card:hover {
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.12), 0 4px 20px rgba(0, 0, 0, 0.08);
+  transform: translateY(-6px);
+}
+
+.room-card:not(:hover) {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.07);
+  transform: translateY(0);
+}
+
+/* Card top row */
+.room-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.room-card__icon-wrap {
+  border-radius: 18px;
+  padding: 12px;
+}
+
+.room-card__badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.room-card__badge {
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  padding: 5px 12px;
+  border-radius: 99px;
+}
+
+/* Room name */
+.room-card__name {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  font-style: italic;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  transition: color 0.25s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #0f172a;
+}
+
+.room-card:hover .room-card__name {
+  color: #4f46e5;
+}
+
+/* Metric tiles */
+.room-card__metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.room-card__metric-tile {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 12px 14px;
+}
+
+.room-card__metric-label {
+  font-size: 9px;
+  font-weight: 900;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 3px;
+}
+
+.room-card__metric-value {
+  font-size: 20px;
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+/* Thermal bar */
+.room-card__thermal {
+  margin-bottom: 18px;
+}
+
+.room-card__thermal-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.room-card__thermal-label {
+  font-size: 9px;
+  font-weight: 900;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.room-card__thermal-track {
+  background: #e2e8f0;
+  border-radius: 99px;
+  overflow: hidden;
+  height: 5px;
+}
+
+.room-card__thermal-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 1s ease;
+}
+
+/* Incident log */
+.room-card__incident {
+  background: #0f172a;
+  border-radius: 16px;
+  padding: 12px 16px;
+  margin-bottom: 18px;
+}
+
+.room-card__incident-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.room-card__incident-title {
+  font-size: 9px;
+  font-weight: 900;
+  color: #818cf8;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.room-card__incident-time {
+  font-size: 9px;
+  font-weight: 700;
+  color: #475569;
+}
+
+.room-card__incident-body {
+  font-size: 13px;
+  font-weight: 900;
+  color: #f8fafc;
+  font-style: italic;
+}
+
+.room-card__incident-empty {
+  color: #475569;
+}

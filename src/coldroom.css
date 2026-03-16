@@ -1,0 +1,110 @@
+/* ============================================================
+   coldroom.css  —  import this once in your main entry file
+   e.g.  import './coldroom.css'  in main.jsx / index.jsx
+   ============================================================ */
+
+/* Google Font — loaded via <link> in index.html, NOT @import here */
+/* Add this to your public/index.html <head>:
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,700;0,900;1,700;1,900&display=swap" rel="stylesheet">
+*/
+
+/* ── Keyframes ─────────────────────────────────────────────── */
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes fadein-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── Pulse dot ─────────────────────────────────────────────── */
+/*
+  Usage:  <span className="pulse-dot" style={{ '--dot-color': '#22c55e' }} />
+*/
+.pulse-dot {
+  position: relative;
+  display: inline-flex;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+}
+
+.pulse-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--dot-color, #22c55e);
+  animation: ping 1.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  opacity: 0.65;
+}
+
+.pulse-dot::after {
+  content: '';
+  position: relative;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--dot-color, #22c55e);
+}
+
+/* ── Card fade-in with stagger ─────────────────────────────── */
+/*
+  Usage:  <div className="room-card-fadein" style={{ '--delay': '0.2s' }} />
+*/
+.room-card-fadein {
+  animation: fadein-up 0.45s ease both;
+  animation-delay: var(--delay, 0s);
+}
+
+/* ── General fade-in ───────────────────────────────────────── */
+.fadein-up {
+  animation: fadein-up 0.5s ease both;
+}
+
+/* ── Spinning icon (used in AI panel loader) ───────────────── */
+.spin-icon {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+}
+
+/* ── Blinking cursor (used in AI panel typewriter) ─────────── */
+.blink-cursor {
+  animation: blink 1s step-end infinite;
+}
+
+/* ── Stat card hover lift ──────────────────────────────────── */
+.stat-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ── Base reset ────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background: #f8fafc;
+  margin: 0;
+}

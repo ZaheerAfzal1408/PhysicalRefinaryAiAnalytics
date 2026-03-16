@@ -1,0 +1,62 @@
+/* ── StatCard ─────────────────────────────────────────────────── */
+.stat-card {
+  background: #fff;
+  border-radius: 22px;
+  padding: 20px 22px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stat-card--clickable {
+  cursor: pointer;
+}
+
+/* Top row: icon + pulse dot */
+.stat-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.stat-card__icon-wrap {
+  border-radius: 14px;
+  padding: 10px;
+}
+
+/* Body */
+.stat-card__label {
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: #94a3b8;
+  margin-bottom: 3px;
+}
+
+.stat-card__value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.stat-card__value {
+  font-size: 30px;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1;
+  font-style: italic;
+}
+
+.stat-card__trend-dir {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.stat-card__subtitle {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-top: 2px;
+}

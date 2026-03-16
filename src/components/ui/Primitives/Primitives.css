@@ -1,0 +1,35 @@
+/* ── Modal Button (Btn) ──────────────────────────────────────────── */
+.modal-btn {
+  width: 100%;
+  padding: 9px 0;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: #1e293b;
+  color: #94a3b8;
+  box-shadow: none;
+}
+
+.modal-btn:hover:not(:disabled) {
+  background: #2d3f55;
+  color: #f1f5f9;
+}
+
+.modal-btn--active {
+  background: #4f46e5;
+  color: #fff;
+  box-shadow: 0 0 0 2px #4f46e580;
+}
+
+.modal-btn--active:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.modal-btn--disabled,
+.modal-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
