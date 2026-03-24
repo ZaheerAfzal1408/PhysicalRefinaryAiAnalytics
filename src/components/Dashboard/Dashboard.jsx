@@ -69,7 +69,7 @@ const AlertStrip = ({ rooms }) => {
             style={{ background: lc.bg, border: `1px solid ${lc.border}40` }}
           >
             <span className="pulse-dot" style={{ '--dot-color': lc.dot }} />
-            <span className="text-[11px] font-extrabold text-slate-900">{(r.tank_name || '').replace(/_/g, ' ')}</span>
+            <span className="text-[11px] font-extrabold text-slate-900">{(r.tank_name || r.tank_id || '').replace(/_/g, ' ')}</span>
             <span className="text-[10px] font-bold" style={{ color: lc.text }}>{r.level_feet != null ? parseFloat(r.level_feet).toFixed(3) : 'N/A'} ft</span>
           </div>
         );
@@ -78,6 +78,7 @@ const AlertStrip = ({ rooms }) => {
   );
 };
 
+
 // ── Room card ─────────────────────────────────────────────────────
 const RoomCard = ({ room, onSelectRoom, idx }) => {
   const lc = getLC(room.level);
@@ -85,10 +86,6 @@ const RoomCard = ({ room, onSelectRoom, idx }) => {
 
   const fakeTemp = parseFloat(room.anomaly_temp || room.level_feet) || 0;
   const trend = [fakeTemp + 2, fakeTemp + 1.2, fakeTemp + 0.5, fakeTemp + 0.1, fakeTemp];
-
-  const recentAnomalies = room.anomaly_count ? parseInt(room.anomaly_count) : (room.anomalies?.length || 0);
-  const penalty = Math.min(75, recentAnomalies * 1.5);
-  const healthScore = (100 - penalty).toFixed(0);
 
   let aiInsight = "All parameters are within normal limits. Tank operation is stable.";
   if (isCritical) {
@@ -99,13 +96,11 @@ const RoomCard = ({ room, onSelectRoom, idx }) => {
 
   return (
     <div
-      className={`group bg-white rounded-[36px] max-sm:rounded-[28px] p-8 max-sm:px-5 max-sm:py-6 cursor-pointer transition-all duration-[350ms] hover:-translate-y-1.5 hover:shadow-[0_24px_64px_rgba(0,0,0,0.12),0_4px_20px_rgba(0,0,0,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.07)] room-card-fadein ${
-        isCritical ? 'relative overflow-hidden after:content-[""] after:absolute after:inset-y-0 after:-left-full after:w-1/2 after:right-0 after:bg-gradient-to-r after:from-transparent after:via-red-500/10 after:to-transparent after:animate-radar-sweep after:pointer-events-none' : ''
-      }`}
+      className={`group bg-white rounded-[36px] max-sm:rounded-[28px] p-8 max-sm:px-5 max-sm:py-6 cursor-pointer transition-all duration-[350ms] hover:-translate-y-1.5 hover:shadow-[0_24px_64px_rgba(0,0,0,0.12),0_4px_20px_rgba(0,0,0,0.08)] shadow-[0_4px_24px_rgba(0,0,0,0.07)] room-card-fadein ${isCritical ? 'relative overflow-hidden after:content-[""] after:absolute after:inset-y-0 after:-left-full after:w-1/2 after:right-0 after:bg-gradient-to-r after:from-transparent after:via-red-500/10 after:to-transparent after:animate-radar-sweep after:pointer-events-none' : ''
+        }`}
       style={{ '--delay': `${idx * 0.1}s`, borderTop: `10px solid ${lc.border}` }}
       onClick={() => onSelectRoom(room)}
     >
-      {/* Top: icon + badge */}
       <div className="flex justify-between items-start mb-5">
         <div className="rounded-[18px] p-3" style={{ background: lc.bg, color: lc.text }}>
           <StatusIcon level={room.level} size={28} />
@@ -121,25 +116,20 @@ const RoomCard = ({ room, onSelectRoom, idx }) => {
         </div>
       </div>
 
-      {/* Room name */}
       <h3 className="text-[26px] max-sm:text-[22px] font-black tracking-[-0.03em] italic uppercase mb-[18px] transition-colors duration-[250ms] whitespace-nowrap overflow-hidden text-ellipsis text-slate-900 group-hover:text-indigo-600">
-        {(room.tank_name || '').replace(/_/g, ' ')}
+        {(room.tank_name || room.tank_id || '').replace(/_/g, ' ')}
       </h3>
 
-      {/* Metric tiles */}
       <div className="grid grid-cols-2 gap-2.5 mb-3.5">
-        {[
-          { label: 'Level Feet', value: `${room.level_feet != null ? parseFloat(room.level_feet).toFixed(3) : 'N/A'} ft`, t: trend },
-        ].map(({ label, value, t }) => (
-          <div key={label} className="bg-slate-50 rounded-2xl px-3.5 py-3">
-            <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.14em] mb-[3px]">{label}</div>
-            <div className="text-[20px] font-black text-slate-900 mb-1.5">{value}</div>
-            <Spark data={t} color={lc.border} />
+        <div className="bg-slate-50 rounded-2xl px-3.5 py-3">
+          <div className="text-[9px] font-black text-slate-400 uppercase tracking-[0.14em] mb-[3px]">Level Feet</div>
+          <div className="text-[20px] font-black text-slate-900 mb-1.5">
+            {room.level_feet != null ? parseFloat(room.level_feet).toFixed(3) : 'N/A'} ft
           </div>
-        ))}
+          <Spark data={trend} color={lc.border} />
+        </div>
       </div>
 
-      {/* Thermal bar */}
       <div className="mb-[18px]">
         <div className="flex justify-between mb-1">
           <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.12em]">Thermal Load</span>
@@ -158,13 +148,12 @@ const RoomCard = ({ room, onSelectRoom, idx }) => {
         </div>
       </div>
 
-      {/* Incident log */}
       <div className="bg-slate-900 rounded-2xl py-3 px-4 mb-[18px]">
         <div className="flex justify-between items-center mb-1">
           <span className="text-[9px] font-black text-indigo-400 uppercase tracking-[0.15em]">Incident Log</span>
-          {room.anomaly_time && (
+          {room.created_at && (
             <span className="text-[9px] font-bold text-slate-600">
-              {new Date(room.anomaly_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {new Date(room.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           )}
         </div>
@@ -175,33 +164,30 @@ const RoomCard = ({ room, onSelectRoom, idx }) => {
         </div>
       </div>
 
-      {/* AI Insights */}
-      <div className="mt-5 p-4 sm:px-5 sm:py-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-[20px] border border-slate-200 relative overflow-hidden before:content-[''] before:absolute before:inset-y-0 before:left-0 before:w-[5px] before:bg-gradient-to-b before:from-indigo-500 before:to-purple-500">
-        <div className="flex items-center text-[11px] font-black text-indigo-500 uppercase tracking-[0.1em] mb-2 max-sm:flex-wrap max-sm:gap-2">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5 shrink-0">
+      <div className="mt-5 p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-[20px] border border-slate-200 relative overflow-hidden before:content-[''] before:absolute before:inset-y-0 before:left-0 before:w-[5px] before:bg-gradient-to-b before:from-indigo-500 before:to-purple-500">
+        <div className="flex items-center text-[11px] font-black text-indigo-500 uppercase tracking-[0.1em] mb-2">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5">
             <path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z" />
           </svg>
           AI Model Analysis
-          <span className="ml-auto max-sm:ml-0 font-black bg-white px-3 py-1.5 max-sm:px-2.5 max-sm:py-1 max-sm:text-[10px] rounded-full border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.04)] whitespace-nowrap shrink-0" style={{ color: healthScore < 80 ? '#ef4444' : '#22c55e' }}>Health: {healthScore}%</span>
+
         </div>
         <div className="text-[13px] font-semibold text-slate-600 leading-snug italic">
           {aiInsight}
         </div>
       </div>
 
-      {/* Call to Action */}
-      <div className="mt-6 flex items-center justify-center gap-2 text-[11px] max-sm:text-[10px] max-sm:leading-[1.4] max-sm:text-center font-extrabold text-slate-400 uppercase tracking-[0.1em] pt-[18px] border-t border-dashed border-slate-200 transition-all duration-[250ms] group-hover:text-indigo-600 group-hover:translate-x-1">
+      <div className="mt-6 flex items-center justify-center gap-2 text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.1em] pt-[18px] border-t border-dashed border-slate-200 group-hover:text-indigo-600">
         <span>Click to view detailed AI stats & logs</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M5 12h14M12 5l7 7-7 7" />
         </svg>
       </div>
-
     </div>
   );
 };
 
-// ── Dashboard ─────────────────────────────────────────────────────
+// ── Dashboard Main ────────────────────────────────────────────────
 const Dashboard = ({ rooms, onSelectRoom }) => {
   const critical = rooms.filter(r => { const l = String(r.level || '').toLowerCase(); return l === 'critical' || l === 'error'; }).length;
   const warnings = rooms.filter(r => String(r.level || '').toLowerCase() === 'warning').length;
@@ -210,9 +196,7 @@ const Dashboard = ({ rooms, onSelectRoom }) => {
   return (
     <div className="min-h-screen bg-slate-50 px-8 py-10 max-sm:px-4 max-sm:py-6">
       <div className="max-w-[1300px] mx-auto">
-
-        {/* Header */}
-        <div className="flex justify-between items-end mb-9 fadein-up">
+        <div className="flex justify-between items-end mb-9">
           <div>
             <h1 className="text-[38px] font-black text-slate-900 tracking-[-0.04em] italic uppercase leading-none">
               Tank Level<span className="text-indigo-600">AI</span> Analytics
@@ -222,31 +206,26 @@ const Dashboard = ({ rooms, onSelectRoom }) => {
               Live System Monitoring · {rooms.length} Units Active
             </p>
           </div>
-          
           <div className="bg-white rounded-2xl px-[18px] py-[10px] border-[1.5px] border-slate-200 text-[11px] font-extrabold text-slate-500 uppercase tracking-[0.12em]">
             {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
 
-        {/* Stat cards */}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-[14px] mb-7">
           <StatCard title="Total Units" value={rooms.length} level="normal" subtitle="Tanks overview" trend={[2, 3, 3, rooms.length, rooms.length]} />
           <StatCard title="Critical" value={critical} level="critical" subtitle="Immediate action" trend={[0, 0, 1, critical, critical]} />
           <StatCard title="Warnings" value={warnings} level="warning" subtitle="Under watch" trend={[0, 1, 1, warnings, warnings]} />
-          <StatCard title="Nominal" value={normal} level="normal" subtitle="Running clean" trend={[2, 2, 2, normal, normal]} />
+          <StatCard title="Normal" value={normal} level="normal" subtitle="Running clean" trend={[2, 2, 2, normal, normal]} />
         </div>
 
-        {/* Alert strip */}
         <AlertStrip rooms={rooms} />
 
-        {/* Cards grid */}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-6">
           {rooms.map((room, idx) => (
             <RoomCard key={idx} idx={idx} room={room} onSelectRoom={onSelectRoom} />
           ))}
         </div>
       </div>
-
       <Chatbot rooms={rooms} />
     </div>
   );

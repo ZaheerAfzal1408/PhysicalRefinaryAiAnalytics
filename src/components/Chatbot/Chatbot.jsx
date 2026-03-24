@@ -73,7 +73,7 @@ const formatBotReply = (text) => {
 const Chatbot = ({ rooms }) => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: `Hi! I'm your Tank AI assistant. Ask me anything about your ${rooms?.length || 0} monitored rooms — anomalies, level_feets, alerts and more.` }
+    { role: 'assistant', content: `Hi! I'm your Tank AI assistant. Ask me anything about your ${rooms?.length || 0} monitored rooms and Tanks like anomalies, level_feets, alerts and more.` }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
