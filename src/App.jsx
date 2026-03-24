@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import Dashboard from './components/Dashboard/Dashboard';
 import DetailView from './components/DetailView/DetailView';
-import { useColdRoomData } from './hooks/useColdRoomData';
-import './coldroom.css';
+import { useTankData } from './hooks/useTankData';
+import './tank.css';
 
 export default function App() {
-  const { history, allHistory, loading, error, rawDebug, fetchData, buildRoomLogs } = useColdRoomData();
+  const { history, allHistory, loading, error, rawDebug, fetchData, buildRoomLogs } = useTankData();
   const [selectedRoom, setSelectedRoom] = useState(null);
 
   const handleSelectRoom = (room) => setSelectedRoom(buildRoomLogs(room));

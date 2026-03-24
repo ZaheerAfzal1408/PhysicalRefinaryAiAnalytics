@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { N8N_URL } from '../constants';
 import { extractHistory, processItem, sortByTimestamp, extractRoomNumber, superClean } from '../utils';
 
-export const useColdRoomData = () => {
+export const useTankData = () => {
   const [history,      setHistory]      = useState([]);
   const [allHistory,   setAllHistory]   = useState([]);
   const [loading,      setLoading]      = useState(true);
@@ -24,31 +24,31 @@ export const useColdRoomData = () => {
       const rawHistory = extractHistory(rawJson, setRawDebug);
 
       if (!Array.isArray(rawHistory) || rawHistory.length === 0) {
-        console.warn('[ColdRoom] Empty history from webhook');
+        console.warn('[Tank] Empty history from webhook');
         setLoading(false);
         return;
       }
 
       const processed = rawHistory.map(processItem);
-      console.log('[ColdRoom] Sample processed record:', processed[0]);
+      console.log('[Tank] Sample processed record:', processed[0]);
       setAllHistory(processed);
 
       // One entry per room (latest), sorted by room number
       const map = new Map();
-      processed.forEach(item => map.set(item.coldroom_name, item));
+      processed.forEach(item => map.set(item.tank_name, item));
       const rooms = Array.from(map.values()).sort((a, b) => {
-        const nA = extractRoomNumber(a.coldroom_name);
-        const nB = extractRoomNumber(b.coldroom_name);
+        const nA = extractRoomNumber(a.tank_name);
+        const nB = extractRoomNumber(b.tank_name);
         if (nA !== nB) return nA - nB;
-        return String(a.coldroom_name).localeCompare(b.coldroom_name);
+        return String(a.tank_name).localeCompare(b.tank_name);
       });
 
-      console.log(`[ColdRoom] ${rooms.length} rooms:`, rooms.map(r => `${r.coldroom_name}(${r.level})`));
+      console.log(`[Tank] ${rooms.length} rooms:`, rooms.map(r => `${r.tank_name}(${r.level})`));
       setHistory(rooms);
       setLoading(false);
 
     } catch (err) {
-      console.error('[ColdRoom] Fetch error:', err);
+      console.error('[Tank] Fetch error:', err);
       setError(err.name === 'AbortError'
         ? 'Request timed out (10s). Check your n8n webhook is running.'
         : (err.message || 'Unknown fetch error'));
@@ -59,7 +59,7 @@ export const useColdRoomData = () => {
   // Build room logs when user selects a room (used by App to pass selectedRoom)
   const buildRoomLogs = (room) => {
     const logs = allHistory
-      .filter(h => h.coldroom_name === room.coldroom_name)
+      .filter(h => h.tank_name === room.tank_name)
       .map((log, idx) => ({
         ...log,
         _originalIndex: idx,
@@ -71,7 +71,7 @@ export const useColdRoomData = () => {
       }))
       .sort(sortByTimestamp);
 
-    console.log('[ColdRoom] Room logs built:', logs.length, 'entries');
+    console.log('[Tank] Room logs built:', logs.length, 'entries');
     return { ...room, logs };
   };
 

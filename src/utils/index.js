@@ -15,11 +15,11 @@ export const superClean = (val) => {
 export const extractHistory = (rawJson, setDebug) => {
   const debugStr = JSON.stringify(rawJson, null, 2).slice(0, 800);
   if (setDebug) setDebug(debugStr);
-  console.log('[ColdRoom] Raw response:', debugStr);
+  console.log('[Tank] Raw response:', debugStr);
 
   if (Array.isArray(rawJson) && rawJson[0]?.json?.history) return rawJson[0].json.history;
   if (Array.isArray(rawJson) && rawJson[0]?.history)       return rawJson[0].history;
-  if (Array.isArray(rawJson) && rawJson[0]?.coldroom_name) return rawJson;
+  if (Array.isArray(rawJson) && rawJson[0]?.tank_name) return rawJson;
   if (rawJson?.json?.history) return rawJson.json.history;
   if (rawJson?.history)       return rawJson.history;
   if (rawJson?.data)          return Array.isArray(rawJson.data) ? rawJson.data : [];
@@ -39,7 +39,7 @@ export const processItem = (item) => {
 
   return {
     ...item,
-    coldroom_name: superClean(item.coldroom_name) || 'Unknown Room',
+    tank_name: superClean(item.tank_name) || 'Unknown Room',
     level:         rawLevel || 'Normal',
     temperature:   superClean(item.temperature  || firstAnomaly.temperature || firstAnomaly.temp  || '0'),
     humidity:      superClean(item.humidity     || firstAnomaly.humidity    || firstAnomaly.humid || '0'),
@@ -75,7 +75,7 @@ export const isWithinWindow = (record, windowMs) => {
 // ── Build sorted+filtered log list for a room ─────────────────────
 export const buildLogs = (allHistory, roomName, windowMs) => {
   return (allHistory || [])
-    .filter(h => h.coldroom_name === roomName)
+    .filter(h => h.tank_name === roomName)
     .filter(h => isWithinWindow(h, windowMs))
     .map((log, idx) => ({
       ...log,

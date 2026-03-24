@@ -4,13 +4,13 @@ import fetch from 'node-fetch';
 const router = express.Router();
 
 router.post('/', async (req, res) => {
-  const { logs, coldroom_name } = req.body;
+  const { logs, tank_name } = req.body;
 
   if (!logs?.length) return res.status(400).json({ error: 'No logs provided' });
 
   const latestLogs = logs.slice(0, 10);
-  const prompt = `You are an expert cold room monitoring AI.
-  Cold Room: ${room.coldroom_name}
+  const prompt = `You are an expert tank monitoring AI.
+  Tank: ${room.tank_name}
   Recent Logs: ${latestLogs.map(l => `- Level: ${l.level}, Temp: ${l.temperature}°C, Humidity: ${l.humidity}%, Anomalies: ${l.anomalies?.length || 0}, Time: ${l.timestamp || l.created_at}`).join('\n')}
 
 Analyze these logs and provide a concise 3-line report:

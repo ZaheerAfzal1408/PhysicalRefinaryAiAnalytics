@@ -13,7 +13,7 @@ const DetailView = ({ room, allHistory, onBack }) => {
   const [timeWindow, setTimeWindow] = useState(W.H24);
   const [groupInt, setGroupInt] = useState(30 * 60 * 1000);
 
-  const allLogs = buildLogs(allHistory, room.coldroom_name, timeWindow);
+  const allLogs = buildLogs(allHistory, room.tank_name, timeWindow);
 
   const filteredLogs = allLogs.filter(log => {
     if (filter === 'all') return true;
@@ -61,7 +61,7 @@ const DetailView = ({ room, allHistory, onBack }) => {
         {/* Header */}
         <div className="detail-card__header">
           <div className="detail-card__title-block">
-            <h2 className="detail-card__title">{room.coldroom_name}</h2>
+            <h2 className="detail-card__title">{room.tank_name}</h2>
             <p className="detail-card__subtitle">Diagnostic History &amp; Event Logs</p>
           </div>
           <div className="detail-card__counts">
@@ -137,7 +137,7 @@ const DetailView = ({ room, allHistory, onBack }) => {
           {filteredLogs.length === 0
             ? <div className="detail-log-empty">No logs match this filter</div>
             : filteredLogs.map((log, idx) => (
-              <LogCard key={`${log.coldroom_name}-${idx}`} log={log} idx={idx} />
+              <LogCard key={`${log.tank_name}-${idx}`} log={log} idx={idx} />
             ))
           }
         </div>

@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import './Chatbot.css';
 
-const CHATBOT_URL = 'https://n8n.srv800629.hstgr.cloud/webhook/12f82977-9c01-49a6-86a0-2b3a4aa88a86/chat';
+const CHATBOT_URL = 'https://n8n.srv800629.hstgr.cloud/webhook/3b751e9f-1507-4912-a62d-32a7b8bc54c5/chat';
 const USER_ID = 'ad7103e4-9595-4000-a56a-8f650e3eddef';
 
 // ── Robot SVG icon ────────────────────────────────────────────────
@@ -73,7 +73,7 @@ const formatBotReply = (text) => {
 const Chatbot = ({ rooms }) => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: `Hi! I'm your ColdRoom AI assistant. Ask me anything about your ${rooms?.length || 0} monitored rooms — anomalies, temperatures, alerts and more.` }
+    { role: 'assistant', content: `Hi! I'm your Tank AI assistant. Ask me anything about your ${rooms?.length || 0} monitored rooms — anomalies, temperatures, alerts and more.` }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -175,10 +175,10 @@ const Chatbot = ({ rooms }) => {
   };
 
   const suggestions = [
-    'Show me the status of Coldroom 4?',
+    'Show me the status of Tank 4?',
     'What is the average temperature?',
-    'Is there any anomaly in coldroom 1',
-    'What is Temperature of coldroom 5?',
+    'Is there any anomaly in tank 1',
+    'What is Temperature of tank 5?',
   ];
 
   const sendActive = Boolean(input.trim()) && !loading;
@@ -196,7 +196,7 @@ const Chatbot = ({ rooms }) => {
         <button
           className="chatbot-fab"
           onClick={() => setOpen(o => !o)}
-          title="ColdRoom AI Assistant"
+          title="Tank AI Assistant"
         >
           {open
             ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
@@ -218,7 +218,7 @@ const Chatbot = ({ rooms }) => {
               <RobotIcon size={24} color="#fff" />
             </div>
             <div>
-              <div className="chatbot-header__name">ColdRoom Assistant</div>
+              <div className="chatbot-header__name">Tank Assistant</div>
               <div className="chatbot-header__status">
                 <div className="chatbot-header__status-dot" />
                 <span className="chatbot-header__status-text">Online · n8n powered</span>
@@ -266,7 +266,7 @@ const Chatbot = ({ rooms }) => {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKey}
-              placeholder="Ask about your cold rooms…"
+              placeholder="Ask about your tanks…"
               rows={1}
             />
             <button

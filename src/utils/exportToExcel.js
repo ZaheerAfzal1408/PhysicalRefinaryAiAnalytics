@@ -75,7 +75,7 @@ export const exportRoomLogsToExcel = (room, logs) => {
 
     return [
       fmtDate(log.created_at || log.timestamp),   // A — Date & Time
-      fmt(log.coldroom_name || room.coldroom_name), // B — Room Name
+      fmt(log.tank_name || room.tank_name), // B — Room Name
       statusValue,                                  // C — Status
       fmt(log.level),                               // D — Current Level
       fmtNum(log.temperature ?? log.anomaly_temp),  // E — Temperature
@@ -117,11 +117,11 @@ export const exportRoomLogsToExcel = (room, logs) => {
   const normal   = logs.filter(l => String(l.level||'').toLowerCase() === 'normal').length;
 
   const summaryData = [
-    ['ColdRoom AI Analytics — Export Report'],
+    ['Tank AI Analytics — Export Report'],
     ['Generated', new Date().toLocaleString()],
     [''],
     ['ROOM SUMMARY'],
-    ['Room Name',        fmt(room.coldroom_name)],
+    ['Room Name',        fmt(room.tank_name)],
     ['Current Level',    fmt(room.level)],
     ['Temperature (°C)', fmtNum(room.temperature)],
     ['Humidity (%)',     fmtNum(room.humidity)],
@@ -146,6 +146,6 @@ export const exportRoomLogsToExcel = (room, logs) => {
   // ─────────────────────────────────────────────────────────────────────────────
   // Download
   // ─────────────────────────────────────────────────────────────────────────────
-  const filename = `${room.coldroom_name}_logs_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const filename = `${room.tank_name}_logs_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(wb, filename);
 };

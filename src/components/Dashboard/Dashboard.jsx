@@ -70,7 +70,7 @@ const AlertStrip = ({ rooms }) => {
             style={{ background: lc.bg, border: `1px solid ${lc.border}40` }}
           >
             <span className="pulse-dot" style={{ '--dot-color': lc.dot }} />
-            <span className="alert-strip__room-name">{r.coldroom_name}</span>
+            <span className="alert-strip__room-name">{r.tank_name}</span>
             <span className="alert-strip__temp" style={{ color: lc.text }}>{r.anomaly_temp}°C</span>
           </div>
         );
@@ -109,7 +109,7 @@ const RoomCard = ({ room, onSelectRoom, idx }) => {
       </div>
 
       {/* Room name */}
-      <h3 className="room-card__name">{room.coldroom_name}</h3>
+      <h3 className="room-card__name">{room.tank_name}</h3>
 
       {/* Metric tiles */}
       <div className="room-card__metrics">
@@ -178,7 +178,7 @@ const Dashboard = ({ rooms, onSelectRoom }) => {
         <div className="dashboard__header fadein-up">
           <div>
             <h1 className="dashboard__title">
-              Coldroom<span className="dashboard__title-accent">AI</span> Analytics
+              Tank<span className="dashboard__title-accent">AI</span> Analytics
             </h1>
             <p className="dashboard__subtitle">
               <span className="pulse-dot" style={{ '--dot-color': '#22c55e' }} />
@@ -192,7 +192,7 @@ const Dashboard = ({ rooms, onSelectRoom }) => {
 
         {/* Stat cards */}
         <div className="dashboard__stats">
-          <StatCard title="Total Units" value={rooms.length} level="normal"   subtitle="Coldrooms overview" trend={[2, 3, 3, rooms.length, rooms.length]} />
+          <StatCard title="Total Units" value={rooms.length} level="normal"   subtitle="Tanks overview" trend={[2, 3, 3, rooms.length, rooms.length]} />
           <StatCard title="Critical"    value={critical}     level="critical" subtitle="Immediate action"   trend={[0, 0, 1, critical, critical]} />
           <StatCard title="Warnings"    value={warnings}     level="warning"  subtitle="Under watch"        trend={[0, 1, 1, warnings, warnings]} />
           <StatCard title="Nominal"     value={normal}       level="normal"   subtitle="Running clean"      trend={[2, 2, 2, normal, normal]} />
