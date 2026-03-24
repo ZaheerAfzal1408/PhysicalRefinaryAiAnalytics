@@ -11,7 +11,7 @@ router.post('/', async (req, res) => {
   const latestLogs = logs.slice(0, 10);
   const prompt = `You are an expert tank monitoring AI.
   Tank: ${room.tank_name}
-  Recent Logs: ${latestLogs.map(l => `- Level: ${l.level}, Temp: ${l.temperature}°C, Humidity: ${l.humidity}%, Anomalies: ${l.anomalies?.length || 0}, Time: ${l.timestamp || l.created_at}`).join('\n')}
+  Recent Logs: ${latestLogs.map(l => `- Level: ${l.level}, Temp: ${l.level_feet}°C, Humidity: ${l.humidity}%, Anomalies: ${l.anomalies?.length || 0}, Time: ${l.timestamp || l.created_at}`).join('\n')}
 
 Analyze these logs and provide a concise 3-line report:
 1 - SITUATION: Overall condition and trend

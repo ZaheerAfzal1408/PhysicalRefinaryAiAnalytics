@@ -18,11 +18,11 @@ export const extractHistory = (rawJson, setDebug) => {
   console.log('[Tank] Raw response:', debugStr);
 
   if (Array.isArray(rawJson) && rawJson[0]?.json?.history) return rawJson[0].json.history;
-  if (Array.isArray(rawJson) && rawJson[0]?.history)       return rawJson[0].history;
-  if (Array.isArray(rawJson) && rawJson[0]?.tank_name) return rawJson;
+  if (Array.isArray(rawJson) && rawJson[0]?.history) return rawJson[0].history;
+  if (Array.isArray(rawJson) && (rawJson[0]?.tank_name || rawJson[0]?.tank_id)) return rawJson;
   if (rawJson?.json?.history) return rawJson.json.history;
-  if (rawJson?.history)       return rawJson.history;
-  if (rawJson?.data)          return Array.isArray(rawJson.data) ? rawJson.data : [];
+  if (rawJson?.history) return rawJson.history;
+  if (rawJson?.data) return Array.isArray(rawJson.data) ? rawJson.data : [];
   if (Array.isArray(rawJson)) return rawJson;
   return [];
 };
@@ -33,20 +33,21 @@ export const processItem = (item) => {
   if (typeof anomaly === 'string') {
     try { anomaly = JSON.parse(anomaly); } catch { anomaly = {}; }
   }
-  const anomalyArr   = Array.isArray(anomaly) ? anomaly : (anomaly && Object.keys(anomaly).length ? [anomaly] : []);
+  const anomalyArr = Array.isArray(anomaly) ? anomaly : (anomaly && Object.keys(anomaly).length ? [anomaly] : []);
   const firstAnomaly = anomalyArr[0] || {};
-  const rawLevel     = superClean(item.level || item.status || firstAnomaly.level || '');
+  const rawLevel = superClean(item.level || item.status || firstAnomaly.level || '');
 
   return {
     ...item,
-    tank_name: superClean(item.tank_name) || 'Unknown Room',
-    level:         rawLevel || 'Normal',
-    temperature:   superClean(item.temperature  || firstAnomaly.temperature || firstAnomaly.temp  || '0'),
-    humidity:      superClean(item.humidity     || firstAnomaly.humidity    || firstAnomaly.humid || '0'),
-    timestamp:     superClean(item.created_at   || item.timestamp || ''),
-    anomaly_temp:  superClean(firstAnomaly.temperature || firstAnomaly.temp  || item.temperature  || '0'),
-    anomaly_humid: superClean(firstAnomaly.humidity    || firstAnomaly.humid || item.humidity     || '0'),
-    anomaly_time:  superClean(firstAnomaly.timestamp   || firstAnomaly.time  || item.timestamp    || ''),
+    tank_name: superClean(item.tank_id || item.tank_name) || 'Unknown Tank',
+    tank_id: superClean(item.tank_id || item.tank_name) || 'Unknown Tank',
+    level: rawLevel || 'Normal',
+    level_feet: superClean(item.level_feet || firstAnomaly.level_feet || firstAnomaly.temp || '0'),
+    humidity: superClean(item.humidity || firstAnomaly.humidity || firstAnomaly.humid || '0'),
+    timestamp: superClean(item.created_at || item.timestamp || ''),
+    anomaly_temp: superClean(firstAnomaly.level_feet || firstAnomaly.temp || item.level_feet || '0'),
+    anomaly_humid: superClean(firstAnomaly.humidity || firstAnomaly.humid || item.humidity || '0'),
+    anomaly_time: superClean(firstAnomaly.timestamp || firstAnomaly.time || item.timestamp || ''),
     _rawAnomalies: anomalyArr,
   };
 };
@@ -81,9 +82,10 @@ export const buildLogs = (allHistory, roomName, windowMs) => {
       ...log,
       _originalIndex: idx,
       anomalies: (log._rawAnomalies || []).map(a => ({
-        t:    superClean(a.temperature || a.temp  || ''),
-        h:    superClean(a.humidity    || a.humid || ''),
-        time: superClean(a.created_at  || a.timestamp || a.time || ''),
+        level_feet: superClean(a.level_feet || a.temp || a.t || ''),
+        timestamp: superClean(a.created_at || a.timestamp || a.time || ''),
+        mse: a.reconstruction_error || a.mse || null,
+        threshold: a.threshold || null,
       })),
     }))
     .sort(sortByTimestamp);

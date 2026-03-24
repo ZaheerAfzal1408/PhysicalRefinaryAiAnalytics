@@ -1,5 +1,4 @@
 import React from 'react';
-import './StatCard.css';
 
 const Sparkline = ({ data, color }) => {
   if (!data || data.length < 2) return null;
@@ -38,11 +37,11 @@ export const StatCard = ({ title, value, icon: Icon, level, subtitle, trend, onC
   return (
     <div
       onClick={onClick}
-      className={`stat-card${onClick ? ' stat-card--clickable' : ''}`}
+      className={`bg-white rounded-[22px] px-[22px] py-5 shadow-[0_4px_20px_rgba(0,0,0,0.06)] flex flex-col gap-3.5 ${onClick ? 'cursor-pointer' : ''}`}
       style={{ borderTop: `5px solid ${c.border}` }}
     >
-      <div className="stat-card__top">
-        <div className="stat-card__icon-wrap" style={{ background: c.icon, color: c.text }}>
+      <div className="flex justify-between items-start">
+        <div className="rounded-[14px] p-2.5" style={{ background: c.icon, color: c.text }}>
           {Icon ? <Icon size={20} /> : (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
@@ -53,14 +52,14 @@ export const StatCard = ({ title, value, icon: Icon, level, subtitle, trend, onC
       </div>
 
       <div>
-        <div className="stat-card__label">{title}</div>
-        <div className="stat-card__value-row">
-          <div className="stat-card__value">{value}</div>
+        <div className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-400 mb-[3px]">{title}</div>
+        <div className="flex items-baseline gap-2">
+          <div className="text-[30px] font-black text-slate-900 leading-none italic">{value}</div>
           {trendDir && (
-            <span className="stat-card__trend-dir" style={{ color: c.text }}>{trendDir}</span>
+            <span className="text-[13px] font-black" style={{ color: c.text }}>{trendDir}</span>
           )}
         </div>
-        {subtitle && <div className="stat-card__subtitle">{subtitle}</div>}
+        {subtitle && <div className="text-[10px] text-slate-400 font-semibold mt-0.5">{subtitle}</div>}
       </div>
 
       {trend && trend.length >= 2 && <Sparkline data={trend} color={c.border} />}

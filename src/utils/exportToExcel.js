@@ -1,5 +1,5 @@
-const fmt     = (val) => (val === null || val === undefined || val === '') ? 'N/A' : String(val);
-const fmtNum  = (val) => { const n = parseFloat(val); return isNaN(n) ? 'N/A' : n; };
+const fmt = (val) => (val === null || val === undefined || val === '') ? 'N/A' : String(val);
+const fmtNum = (val) => { const n = parseFloat(val); return isNaN(n) ? 'N/A' : n; };
 const fmtDate = (raw) => {
   if (!raw) return 'N/A';
   const d = new Date(raw);
@@ -13,12 +13,8 @@ const fmtDate = (raw) => {
 // Build anomaly detail string for critical rows
 const buildAnomalyDetail = (log) => {
   const parts = [];
-  if (log.anomaly_temp  != null && log.anomaly_temp  !== '') parts.push(`Temp: ${fmtNum(log.anomaly_temp)}°C`);
-  if (log.anomaly_humid != null && log.anomaly_humid !== '') parts.push(`Humidity: ${fmtNum(log.anomaly_humid)}%`);
-  if (log.anomaly_count != null && log.anomaly_count !== '') parts.push(`Count: ${log.anomaly_count}`);
-  if (log.reconstruction_error != null && log.reconstruction_error !== '')
-    parts.push(`Recon Error: ${parseFloat(log.reconstruction_error).toFixed(4)}`);
-  if (log.intense != null && log.intense !== '') parts.push(`Intense: ${log.intense}`);
+  const count = log.anomaly_count ?? (log.anomalies?.length || 0);
+  if (count > 0) parts.push(`Count: ${count}`);
 
   // Also parse anomalies JSON array if present
   try {
@@ -26,13 +22,13 @@ const buildAnomalyDetail = (log) => {
     if (Array.isArray(arr) && arr.length > 0) {
       arr.forEach((a, i) => {
         const sub = [];
-        if (a.type)  sub.push(a.type);
-        if (a.value != null) sub.push(`val: ${a.value}`);
-        if (a.threshold != null) sub.push(`thresh: ${a.threshold}`);
+        if (a.level_feet != null) sub.push(`Level: ${parseFloat(a.level_feet).toFixed(3)} ft`);
+        if (a.threshold != null) sub.push(`Limit: ${parseFloat(a.threshold).toFixed(3)}`);
+        if (a.mse != null) sub.push(`Error: ${Number(a.mse).toExponential(2)}`);
         if (sub.length) parts.push(`[${i + 1}] ${sub.join(', ')}`);
       });
     }
-  } catch (_) {}
+  } catch (_) { }
 
   return parts.length ? parts.join(' | ') : 'N/A';
 };
@@ -44,28 +40,26 @@ export const exportRoomLogsToExcel = (room, logs) => {
   }
 
   const XLSX = window.XLSX;
-  const wb   = XLSX.utils.book_new();
+  const wb = XLSX.utils.book_new();
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Sheet 1 — Main Logs
-  // Columns: Date & Time | Room Name | Status | Current Level | Temp | Humidity | Total Logs
-  // If status = Critical → show full anomaly details in Status cell
   // ─────────────────────────────────────────────────────────────────────────────
 
   const HEADERS = [
     'Date & Time',
-    'Room Name',
-    'Status',
-    'Current Level',
-    'Temperature (°C)',
-    'Humidity (%)',
+    'Tank Name',
+    'Status Log',
+    'Overall Status Level',
+    'Latest Level (ft)',
+    'Anomaly Count',
     'Total Logs',
   ];
 
   const totalLogs = logs.length;
 
   const dataRows = logs.map((log, idx) => {
-    const level      = String(log.level  || log.status || '').toLowerCase();
+    const level = String(log.level || log.status || '').toLowerCase();
     const isCritical = level === 'critical' || level === 'error';
 
     // Status cell: if critical, expand with anomaly details
@@ -75,11 +69,11 @@ export const exportRoomLogsToExcel = (room, logs) => {
 
     return [
       fmtDate(log.created_at || log.timestamp),   // A — Date & Time
-      fmt(log.tank_name || room.tank_name), // B — Room Name
+      fmt(log.tank_name || room.tank_name),       // B — Tank Name
       statusValue,                                  // C — Status
       fmt(log.level),                               // D — Current Level
-      fmtNum(log.temperature ?? log.anomaly_temp),  // E — Temperature
-      fmtNum(log.humidity    ?? log.anomaly_humid),  // F — Humidity
+      fmtNum(log.level_feet),                       // E — Level ft
+      fmt(log.anomaly_count ?? (log.anomalies?.length || 0)), // F — Count
       idx === 0 ? totalLogs : '',                   // G — Total Logs (only on first row)
     ];
   });
@@ -90,10 +84,10 @@ export const exportRoomLogsToExcel = (room, logs) => {
   logsSheet['!cols'] = [
     { wch: 22 },  // Date & Time
     { wch: 16 },  // Room Name
-    { wch: 52 },  // Status (wide — holds anomaly detail)
-    { wch: 16 },  // Current Level
-    { wch: 18 },  // Temperature
-    { wch: 14 },  // Humidity
+    { wch: 72 },  // Status (extra wide — holds anomaly detail)
+    { wch: 20 },  // Current Level
+    { wch: 18 },  // Level ft
+    { wch: 16 },  // Anomaly Count
     { wch: 12 },  // Total Logs
   ];
 
@@ -112,24 +106,24 @@ export const exportRoomLogsToExcel = (room, logs) => {
   // ─────────────────────────────────────────────────────────────────────────────
   // Sheet 2 — Summary
   // ─────────────────────────────────────────────────────────────────────────────
-  const critical = logs.filter(l => ['critical','error'].includes(String(l.level||'').toLowerCase())).length;
-  const warnings = logs.filter(l => String(l.level||'').toLowerCase() === 'warning').length;
-  const normal   = logs.filter(l => String(l.level||'').toLowerCase() === 'normal').length;
+  const critical = logs.filter(l => ['critical', 'error'].includes(String(l.level || '').toLowerCase())).length;
+  const warnings = logs.filter(l => String(l.level || '').toLowerCase() === 'warning').length;
+  const normal = logs.filter(l => String(l.level || '').toLowerCase() === 'normal').length;
 
   const summaryData = [
-    ['Tank AI Analytics — Export Report'],
+    ['Tank Level AI Analytics — Export Report'],
     ['Generated', new Date().toLocaleString()],
     [''],
-    ['ROOM SUMMARY'],
-    ['Room Name',        fmt(room.tank_name)],
-    ['Current Level',    fmt(room.level)],
-    ['Temperature (°C)', fmtNum(room.temperature)],
-    ['Humidity (%)',     fmtNum(room.humidity)],
+    ['TANK SUMMARY'],
+    ['Tank Name', fmt(room.tank_name)],
+    ['Overall Status', fmt(room.level)],
+    ['Latest Level (ft)', fmtNum(room.level_feet)],
+    ['Overall Anomalies', logs.reduce((sum, l) => sum + (l.anomalies?.length || 0), 0)],
     [''],
     ['LOG COUNTS'],
     ['Critical / Error', critical],
-    ['Warnings',         warnings],
-    ['Normal',           normal],
+    ['Warnings', warnings],
+    ['Normal', normal],
     [''],
     ['Date Range',
       logs.length > 0

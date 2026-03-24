@@ -1,1 +1,10 @@
 @import "tailwindcss";
+
+@theme {
+  --animate-radar-sweep: radar-sweep 2.5s infinite linear;
+
+  @keyframes radar-sweep {
+    0% { left: -100%; }
+    100% { left: 200%; }
+  }
+}
