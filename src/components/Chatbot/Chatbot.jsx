@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import './Chatbot.css';
 
 const CHATBOT_URL = 'https://n8n.srv800629.hstgr.cloud/webhook/12f82977-9c01-49a6-86a0-2b3a4aa88a86/chat';
 const USER_ID = '2c93a101-2fd6-4889-816d-b0c0075ce2ff';
@@ -27,11 +26,11 @@ const RobotIcon = ({ size = 28, color = '#fff' }) => (
 
 // ── Typing dots ───────────────────────────────────────────────────
 const TypingDots = () => (
-  <div className="chatbot-typing-dots">
+  <div className="flex gap-1 items-center py-1">
     {[0, 1, 2].map(i => (
       <div
         key={i}
-        className="chatbot-typing-dot"
+        className="w-[7px] h-[7px] rounded-full bg-indigo-600 animate-typing-bounce"
         style={{ animationDelay: `${i * 0.2}s` }}
       />
     ))}
@@ -42,13 +41,16 @@ const TypingDots = () => (
 const Message = ({ msg }) => {
   const isUser = msg.role === 'user';
   return (
-    <div className={`chatbot-message chatbot-message--${isUser ? 'user' : 'bot'}`}>
+    <div className={`flex mb-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
-        <div className="chatbot-message__avatar">
+        <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-400 flex items-center justify-center shrink-0 mr-2 self-end">
           <RobotIcon size={16} color="#fff" />
         </div>
       )}
-      <div className={`chatbot-message__bubble chatbot-message__bubble--${isUser ? 'user' : 'bot'}`}>
+      <div className={`max-w-[75%] px-3.5 py-2.5 text-[13px] leading-relaxed font-medium whitespace-pre-wrap break-words ${isUser
+        ? 'rounded-[18px_18px_4px_18px] bg-indigo-600 text-white'
+        : 'rounded-[18px_18px_18px_4px] bg-slate-100 text-slate-900 shadow-sm'
+        }`}>
         <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
       </div>
     </div>
@@ -106,8 +108,6 @@ const Chatbot = ({ rooms }) => {
         chatInput: `${USER_ID}: ${text}`,
       };
 
-      console.log('[Chatbot] Sending payload:', JSON.stringify(payload));
-
       const res = await fetch(CHATBOT_URL, {
         method: 'POST',
         mode: 'cors',
@@ -115,19 +115,14 @@ const Chatbot = ({ rooms }) => {
         body: JSON.stringify(payload),
       });
 
-      console.log('[Chatbot] Response status:', res.status, res.statusText);
-
       const contentType = res.headers.get('content-type') || '';
       let data;
       if (contentType.includes('application/json')) {
         data = await res.json();
       } else {
         const rawText = await res.text();
-        console.log('[Chatbot] Non-JSON response:', rawText);
         try { data = JSON.parse(rawText); } catch { data = { output: rawText }; }
       }
-
-      console.log('[Chatbot] Response data:', JSON.stringify(data));
 
       let raw = '';
       if (typeof data === 'string') {
@@ -145,7 +140,6 @@ const Chatbot = ({ rooms }) => {
       }
 
       raw = String(raw || '').trim();
-      console.log('[Chatbot] Extracted reply:', raw);
 
       const isDisclaimer =
         raw.toLowerCase().includes('before doing any query') ||
@@ -160,10 +154,9 @@ const Chatbot = ({ rooms }) => {
       if (!open) setUnread(n => n + 1);
 
     } catch (err) {
-      console.error('[Chatbot] Error:', err);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: `⚠️ Request failed: ${err.message}\n\nCheck browser console (F12) for details.`,
+        content: `⚠️ Request failed: ${err.message}`,
       }]);
     } finally {
       setLoading(false);
@@ -178,23 +171,25 @@ const Chatbot = ({ rooms }) => {
     'Show me the status of Physical 4?',
     'What is the average level_feet?',
     'Is there any anomaly in Physical 1',
-    'What is Temperature of Physical 5?',
+    'What is level of Physical 12?',
   ];
 
   const sendActive = Boolean(input.trim()) && !loading;
 
   return (
     <>
-      {/* ── FAB ── */}
-      <div className="chatbot-fab-wrap">
-        {!open && <div className="chatbot-pulse-ring" />}
+      {/* ── FAB Wrapper ── */}
+      <div className="fixed bottom-7 right-7 z-[4000]">
+        {!open && <div className="absolute inset-[-4px] rounded-full bg-indigo-600/35 animate-pulse-ring pointer-events-none" />}
 
         {unread > 0 && !open && (
-          <div className="chatbot-unread-badge">{unread}</div>
+          <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-black flex items-center justify-center border-2 border-white z-[1]">
+            {unread}
+          </div>
         )}
 
         <button
-          className="chatbot-fab"
+          className="relative z-[1] width-[60px] height-[60px] w-[60px] h-[60px] rounded-full border-none bg-gradient-to-br from-indigo-600 to-violet-600 cursor-pointer flex items-center justify-center shadow-[0_4px_20px_rgba(79,70,229,0.4)] transition-all duration-200 hover:scale-[1.08] hover:shadow-[0_8px_32px_rgba(79,70,229,0.5)] active:scale-[0.96] animate-fab-pop"
           onClick={() => setOpen(o => !o)}
           title="Tank AI Assistant"
         >
@@ -210,32 +205,32 @@ const Chatbot = ({ rooms }) => {
 
       {/* ── Chat panel ── */}
       {open && (
-        <div className="chatbot-panel">
+        <div className="fixed bottom-[104px] right-7 z-[3999] w-[380px] max-w-[calc(100vw-56px)] h-[560px] max-h-[calc(100vh-140px)] bg-white rounded-3xl shadow-[0_24px_80px_rgba(0,0,0,0.18)] flex flex-col overflow-hidden border border-slate-200 animate-chat-slide-up">
 
           {/* Header */}
-          <div className="chatbot-header">
-            <div className="chatbot-header__avatar">
+          <div className="p-[14px_18px] bg-slate-900 flex items-center gap-2.5 shrink-0">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shrink-0">
               <RobotIcon size={24} color="#fff" />
             </div>
             <div>
-              <div className="chatbot-header__name">Tank Assistant</div>
-              <div className="chatbot-header__status">
-                <div className="chatbot-header__status-dot" />
-                <span className="chatbot-header__status-text">Online · n8n powered</span>
+              <div className="text-[13px] font-black text-slate-50">Tank Assistant</div>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                <span className="text-[10px] color-slate-400 text-slate-400 font-bold uppercase tracking-wider">Online · n8n powered</span>
               </div>
             </div>
           </div>
 
-          {/* Messages */}
-          <div className="chatbot-messages">
+          {/* Messages area */}
+          <div className="flex-1 overflow-y-auto p-[16px_14px_8px] bg-slate-50/50">
             {messages.map((msg, i) => <Message key={i} msg={msg} />)}
 
             {loading && (
-              <div className="chatbot-typing-row">
-                <div className="chatbot-message__avatar">
+              <div className="flex mb-3">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-400 flex items-center justify-center shrink-0 mr-2 self-end">
                   <RobotIcon size={16} color="#fff" />
                 </div>
-                <div className="chatbot-typing-bubble">
+                <div className="bg-slate-100 rounded-[18px_18px_18px_4px] px-3.5 py-2.5 shadow-sm">
                   <TypingDots />
                 </div>
               </div>
@@ -245,11 +240,11 @@ const Chatbot = ({ rooms }) => {
 
           {/* Suggestions */}
           {messages.length === 1 && (
-            <div className="chatbot-suggestions">
+            <div className="px-3 pb-3 flex gap-1.5 flex-wrap bg-slate-50/50">
               {suggestions.map(s => (
                 <button
                   key={s}
-                  className="chatbot-suggestion-btn"
+                  className="px-2.5 py-1.5 rounded-full text-[11px] font-bold bg-white border border-slate-200 text-indigo-600 cursor-pointer transition-colors duration-200 hover:bg-indigo-600 hover:text-white"
                   onClick={() => { setInput(s); inputRef.current?.focus(); }}
                 >
                   {s}
@@ -258,11 +253,11 @@ const Chatbot = ({ rooms }) => {
             </div>
           )}
 
-          {/* Input */}
-          <div className="chatbot-input-row">
+          {/* Input row */}
+          <div className="p-[10px_12px] border-t border-slate-200 flex gap-2 items-end bg-white shrink-0">
             <textarea
               ref={inputRef}
-              className="chatbot-textarea"
+              className="flex-1 resize-none border-1.5 border-slate-200 focus:border-indigo-600 rounded-[14px] p-[9px_14px] text-[13px] outline-none leading-relaxed bg-slate-50 text-slate-900 max-height-[100px] transition-colors"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKey}
@@ -270,7 +265,10 @@ const Chatbot = ({ rooms }) => {
               rows={1}
             />
             <button
-              className={`chatbot-send-btn ${sendActive ? 'chatbot-send-btn--active' : 'chatbot-send-btn--disabled'}`}
+              className={`w-[38px] h-[38px] rounded-full border-none flex items-center justify-center shrink-0 transition-all duration-200 ${sendActive
+                ? 'bg-indigo-600 text-white cursor-pointer shadow-md'
+                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                }`}
               onClick={sendMessage}
               disabled={!sendActive}
             >
