@@ -175,10 +175,10 @@ const Chatbot = ({ rooms }) => {
   };
 
   const suggestions = [
-    'Show me the status of Tank 4?',
+    'Show me the status of Physical 4?',
     'What is the average level_feet?',
-    'Is there any anomaly in tank 1',
-    'What is Temperature of tank 5?',
+    'Is there any anomaly in Physical 1',
+    'What is Temperature of Physical 5?',
   ];
 
   const sendActive = Boolean(input.trim()) && !loading;
