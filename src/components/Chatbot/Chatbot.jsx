@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 const CHATBOT_URL = 'https://n8n.srv800629.hstgr.cloud/webhook/12f82977-9c01-49a6-86a0-2b3a4aa88a86/chat';
-const USER_ID = '2c93a101-2fd6-4889-816d-b0c0075ce2ff';
+const USER_ID = 'ad7103e4-9595-4000-a56a-8f650e3eddef:';
 
 // ── Robot SVG icon ────────────────────────────────────────────────
 const RobotIcon = ({ size = 28, color = '#fff' }) => (
