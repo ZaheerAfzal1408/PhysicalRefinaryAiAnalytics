@@ -132,7 +132,7 @@ const RoomCard = ({ room, onSelectRoom, idx }) => {
 
       <div className="mb-[18px]">
         <div className="flex justify-between mb-1">
-          <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.12em]">Thermal Load</span>
+          <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.12em]">Capacity Usage</span>
           <span style={{ fontSize: 9, fontWeight: 800, color: lc.text }}>
             {Math.abs(parseFloat(room.anomaly_temp || room.level_feet) || 0).toFixed(1)}ft
           </span>
